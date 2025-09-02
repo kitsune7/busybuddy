@@ -1,4 +1,4 @@
-.PHONY: help setup install-uv sync run
+.PHONY: help setup install-uv sync run test
 
 help:
 	@echo "Targets:"
@@ -33,4 +33,7 @@ run:
 	@if [ ! -f .env ] && [ -z "$$GEMINI_API_KEY" ]; then \
 		echo "Note: GEMINI_API_KEY not set and no .env found; the agent may fail to authenticate."; \
 	fi
-	uv run src/busy_buddy/main.py
+	uv run python -m src.busy_buddy.main
+
+test:
+	uv run pytest -q

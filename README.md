@@ -1,4 +1,4 @@
-# busybuddy
+# Busy Buddy
 
 Turn "busy work" into "buddy work" with Busy Buddy, an AI agent that helps answer coding questions by looking up relevant documentation. It uses the Context7 API under the hood to access high-quality code snippets and documentation. It provides examples, explanations, and is even transparent about its sources!
 
@@ -31,7 +31,7 @@ After installing `uv`, you'll want to set up the virtual environment by running 
 As long as `uv` is installed, you can just run this.
 
 ```shell
-uv run src/busy_buddy/main.py
+uv run python -m src.busy_buddy.main
 ```
 
 This works on any OS with `uv`.
@@ -43,6 +43,24 @@ If you have Make installed, you can also just run `make run`.
 If you'd prefer not to install `uv`, then you can just use pip to install the dependencies from `pyproject.toml`. You can also set up a virtual environment if you'd like to isolate the dependencies.
 
 Then just run `./run.py`.
+
+## Running Tests
+
+You can use uv to run tests.
+
+To do this, first, you'll want to run
+
+```shell
+uv sync --group dev
+```
+
+to ensure dev dependencies are installed.
+
+Then you can just run
+
+```shell
+uv run pytest -q
+```
 
 ## Examples
 

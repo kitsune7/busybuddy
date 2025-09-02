@@ -6,7 +6,7 @@ from smolagents import (
 import dotenv
 import os
 
-from tools import fetch_library_docs
+from .tools import fetch_library_docs
 
 def run_application():
   dotenv.load_dotenv()
