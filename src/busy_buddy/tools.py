@@ -34,32 +34,28 @@ def fetch_library_docs(query: str, topic: str) -> DocumentationResult:
 
     library_search_api_url = f"https://context7.com/api/v1/search?query={query}"
     library_id = None
-    try:
-      response = requests.get(library_search_api_url)
-      if response.status_code == 200:
-        data = response.json()
-        results = data.get("results", [])
-        if len(results) == 0:
-          raise Exception(f"No documentation found for '{query}'.")
-        elif not results[0].get("id", ""):
-          raise Exception(f"Couldn't find library ID for\n'{json.dumps(results[0], indent=2)}'.")
-        else:
-          library_id = results[0]['id']
-    except Exception as e:
-      return f"Error fetching library documentation: {str(e)}"
-    
-    documentation_api_url = f"https://context7.com/api/v1{library_id}?topic={topic}"
-    try:
-      response = requests.get(documentation_api_url)
-      if response.status_code == 200:
-        return parse_documentation_response(response.text)
+
+    response = requests.get(library_search_api_url)
+    if response.status_code == 200:
+      data = response.json()
+      results = data.get("results", [])
+      if len(results) == 0:
+        raise Exception(f"No documentation found for '{query}'.")
+      elif not results[0].get("id", ""):
+        raise Exception(f"Couldn't find library ID for\n'{json.dumps(results[0], indent=2)}'.")
       else:
-        raise Exception(f"Received status code {response.status_code}")
-    except Exception as e:
-      return f"Error fetching documentation for {library_id} with topic \"{topic}\": {str(e)}"
+        library_id = results[0]['id']
+
+    documentation_api_url = f"https://context7.com/api/v1{library_id}?topic={topic}"
+
+    response = requests.get(documentation_api_url)
+    if response.status_code == 200:
+      return parse_documentation_response(response.text)
+    else:
+      raise Exception(f"Error fetching documentation for {library_id} with topic \"{topic}\": {response.status_code} - {response.text}")
 
 def parse_documentation_response(text: str) -> DocumentationResult:
-  result = {
+  result: DocumentationResult = {
     "snippets": [],
     "qa": []
   }
@@ -71,13 +67,13 @@ def parse_documentation_response(text: str) -> DocumentationResult:
       result["snippets"] = parse_code_snippet(group)
     elif "Q:" in group and "A:" in group:
       result["qa"] = parse_qa_pair(group)
-  
+
   return result
 
 def parse_code_snippet(text: str) -> list[CodeSnippet]:
   results = []
   separator = '----------------------------------------'
-  
+
   lines = text.strip().split('\n')
   sections = '\n'.join(lines).split(separator)
   for section in sections:
@@ -104,7 +100,7 @@ def parse_code_snippet(text: str) -> list[CodeSnippet]:
 def parse_qa_pair(text: str) -> list[QA]:
   results = []
   separator = '----------------------------------------'
-  
+
   lines = text.strip().split('\n')
   sections = '\n'.join(lines).split(separator)
   for section in sections:
