@@ -1,4 +1,5 @@
 from unittest.mock import patch
+import pytest
 
 from src.busy_buddy.tools import fetch_library_docs
 
@@ -50,12 +51,12 @@ def test_fetch_library_docs_success(*args, **kwargs):
 
 @patch("src.busy_buddy.tools.requests.get", side_effect=mocked_requests_get_search_no_results)
 def test_fetch_library_docs_no_results(*args, **kwargs):
-  result = fetch_library_docs(query="missing-lib", topic="anything")
-  assert isinstance(result, str)
-  assert "No documentation found" in result
+  with pytest.raises(Exception) as excinfo:
+    fetch_library_docs(query="missing-lib", topic="anything")
+  assert "No documentation found" in str(excinfo.value)
 
 @patch("src.busy_buddy.tools.requests.get", side_effect=mocked_requests_get_docs_error)
 def test_fetch_library_docs_docs_error(*args, **kwargs):
-  result = fetch_library_docs(query="org-pkg", topic="intro")
-  assert isinstance(result, str)
-  assert "Error fetching documentation" in result or "Received status code" in result
+  with pytest.raises(Exception) as excinfo:
+    fetch_library_docs(query="org-pkg", topic="intro")
+  assert "Error fetching documentation" in str(excinfo.value)
